@@ -1,17 +1,32 @@
 
 <template>
+
+  <!-- Calendário-->
+  <h3>Calendário:</h3>
+  <VueDataPicker v-model="dataSelecionada"
+    inline auto-apply
+    :format-locale="ptBR"
+    format="P"
+    :locale="localeConfig"></VueDataPicker>
   <div id="app">
+
     <h2>Lista de Tarefas da Claudia</h2>
 
-    <input placeholder=" Adicione uma tarefa" type="text" v-model="novaTarefa" v-on:keyup.enter="adicionarTarefa" :disabled = "edicaoAtiva">
+    <input 
+      placeholder=" Adicione uma tarefa" 
+      type="text" 
+      v-model="novaTarefa" 
+      v-on:keyup.enter="adicionarTarefa" 
+      :disabled = "edicaoAtiva">
     <button v-on:click="adicionarTarefa"> Adicionar</button>
-    <p></p>
     <ul>
       <li v-for="(tarefa, index) in tarefas" :key="index">
         <span v-if="!tarefaEditando[index]"> {{ tarefa }}</span>
         <input v-else type="text" v-model="tarefas[index]" v-on:blur="concluirEdicao(index)" v-on:keyup.enter="concluirEdicao(index)">
-        <button v-on:click="editarTarefa(index)" > {{ tarefaEditando[index] ? 'Concluir' : 'Editar'}}</button>
-        <button v-on:click="removerTarefa(index)" >Remover</button>
+        <div>
+          <button v-on:click="editarTarefa(index)" > {{ tarefaEditando[index] ? 'Concluir' : 'Editar'}}</button>
+          <button v-on:click="removerTarefa(index)" >Remover</button>
+        </div>
       </li>
     </ul>
     </div>
@@ -22,6 +37,10 @@
 <!--COMPOSITION API  inicio -->
 <script setup>
 import { computed, ref } from 'vue'
+import { ptBR } from 'date-fns/locale';
+import VueDataPicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
+
 
 //variavel reativa para armazenar as novas tarefas
 const novaTarefa = ref('');
@@ -42,6 +61,9 @@ const adicionarTarefa = () => {
     novaTarefa.value = '';
   }
 };
+
+//variavel reativa para data do calendario
+const dataSelecionada = ref( new Date());
 
 const removerTarefa = (index) => {
   tarefas.value.splice(index, 1);
