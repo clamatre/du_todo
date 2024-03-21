@@ -18,18 +18,33 @@
       v-model="novaTarefa" 
       v-on:keyup.enter="adicionarTarefa" 
       :disabled = "edicaoAtiva">
-    <button v-on:click="adicionarTarefa"> Adicionar</button>
+    <div>
+      <button v-on:click="adicionarTarefa"> Adicionar</button>
+    </div>
+
+    <!-- mudar skin do botao editar quando tarefa concluida   -->
     <ul>
       <li v-for="(tarefa, index) in tarefas" :key="index">
-        <span v-if="!tarefaEditando[index]"> {{ tarefa }}</span>
+        <input type="checkbox" v-model="tarefaConcluida[index]">
+        <span v-if="!tarefaEditando[index] && !tarefaConcluida[index]"> {{ tarefa }} </span>
+        <span v-else-if="tarefaConcluida[index]" :class="{ 'concluida' : tarefaConcluida[index] }" > {{ tarefa }} </span>
         <input v-else type="text" v-model="tarefas[index]" v-on:blur="concluirEdicao(index)" v-on:keyup.enter="concluirEdicao(index)">
         <div>
-          <button v-on:click="editarTarefa(index)" > {{ tarefaEditando[index] ? 'Concluir' : 'Editar'}}</button>
-          <button v-on:click="removerTarefa(index)" >Remover</button>
+          <button v-on:click="tarefaEditando[index] ? concluirEdicao(index) : editarTarefa(index)" 
+            :disabled = "tarefaConcluida[index]"
+            :class="{ 'botao-bloqueado': tarefaConcluida[index] }"
+            >
+            {{ tarefaEditando[index] ? 'Concluir' : 'Editar' }}
+          </button>
+          <button v-on:click="removerTarefa(index)"
+            :class="{ 'botao-bloqueado': tarefaConcluida[index] }"
+            :disabled="tarefaConcluida[index]"
+            > Remover </button>
         </div>
       </li>
     </ul>
-    </div>
+
+  </div>
 </template>
 
 
@@ -51,13 +66,19 @@ const tarefas = ref([]);
 //array reativo para armazenar o estado de edição das tarefas
 const tarefaEditando = ref([]);
 
+//array reativo para armazenar o estado de conclusao das tarefas
+const tarefaConcluida = ref([]);
+
+//verifica se algum elemento do array de tarefaEditando é verdadeiro,
+//ou seja, retorna verdadeiro se alguma tarefa está sendo editada
 const edicaoAtiva = computed(() => tarefaEditando.value.some(estado => estado));
 
 const adicionarTarefa = () => {
-  if (novaTarefa.value.trim() !== '') {
+  if (novaTarefa.value.trim() !== '' && !edicaoAtiva.value ){
     tarefas.value.push(novaTarefa.value);
     //a tarefa nao está sendo editada
     tarefaEditando.value.push(false);
+    tarefaConcluida.value.push(false);
     novaTarefa.value = '';
   }
 };
@@ -68,7 +89,8 @@ const dataSelecionada = ref( new Date());
 const removerTarefa = (index) => {
   tarefas.value.splice(index, 1);
   //remove o estado de edição 
-  tarefaEditando.value.splice(index,1) 
+  tarefaEditando.value.splice(index,1)
+  tarefaConcluida.value.splice(index,1);
 };
 
 
@@ -154,4 +176,16 @@ button {
   border: none;
   margin: 10px;
 }
+
+.concluida {
+  text-decoration: line-through;   
+}
+
+.botao-bloqueado {
+  background-color: gray; /* Altere para a cor desejada */
+  color: white; /* Altere para a cor desejada */
+  cursor: not-allowed; /* Define o cursor como indisponível */
+}
+
+
 </style>
