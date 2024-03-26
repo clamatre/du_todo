@@ -22,24 +22,33 @@
       <button v-on:click="adicionarTarefa"> Adicionar</button>
     </div>
 
-    <!-- mudar skin do botao editar quando tarefa concluida   -->
     <ul>
-      <li v-for="(tarefa, index) in tarefas" :key="index">
+      <li v-for="(tarefa, index) in tarefas" :key="index" v-on:click="editarTarefa[index]" >
         <input type="checkbox" v-model="tarefaConcluida[index]">
-        <span v-if="!tarefaEditando[index] && !tarefaConcluida[index]"> {{ tarefa }} </span>
+        <span v-if="!tarefaEditando[index] && !tarefaConcluida[index]" v-on:click="editarTarefa(index)"> {{ tarefa }} </span>
         <span v-else-if="tarefaConcluida[index]" :class="{ 'concluida' : tarefaConcluida[index] }" > {{ tarefa }} </span>
         <input v-else type="text" v-model="tarefas[index]" v-on:blur="concluirEdicao(index)" v-on:keyup.enter="concluirEdicao(index)">
         <div>
-          <button v-on:click="tarefaEditando[index] ? concluirEdicao(index) : editarTarefa(index)" 
-            :disabled = "tarefaConcluida[index]"
-            :class="{ 'botao-bloqueado': tarefaConcluida[index] }"
-            >
-            {{ tarefaEditando[index] ? 'Concluir' : 'Editar' }}
+          <button v-on:click="concluirEdicao(index)"
+            v-if="tarefaEditando[index]"
+            :disabled="tarefaConcluida[index]"
+            :class=" { 'botao-bloqueado' : tarefaConcluida[index] }"
+          >
+          Concluir
           </button>
+          <!-- <button v-on:click="editarTarefa[index]"
+            v-if="!tarefaEditando[index] && !tarefaConcluida[index]"
+            :disabled="tarefaConcluida[index]"
+            :class=" { 'botao-bloqueado' : tarefaConcluida[index] } "
+          >
+          Editar
+          </button> -->
           <button v-on:click="removerTarefa(index)"
             :class="{ 'botao-bloqueado': tarefaConcluida[index] }"
             :disabled="tarefaConcluida[index]"
-            > Remover </button>
+          >
+          Remover 
+          </button>
         </div>
       </li>
     </ul>
@@ -108,35 +117,6 @@ const concluirEdicao = (index) => {
 </script>   
 <!-- fim  -->
 
-
-
-
-
-<!--   OPTIONS API   inicio
-<script>
-export default {
-  data(){
-    return {
-      novaTarefa: '',
-      tarefas:[]
-    }
-  },
-  methods:{
-    addTarefa(){
-      if( this.novaTarefa.trim() !== ''){
-        this.tarefas.push(this.novaTarefa);
-        this.novaTarefa = '';
-      }
-    },
-    removeTarefa(index){
-      this.tarefas.splice(index,1);
-    }
-  }
-}
-</script>
-fim -->
-
-
 <style>
 body {
   font-family: Arial, sans-serif;
@@ -149,7 +129,7 @@ body {
 }
 
 #app {
-  width: 500px;
+  width: 70%;
 }
 
 input[type="text"] {
@@ -182,9 +162,9 @@ button {
 }
 
 .botao-bloqueado {
-  background-color: gray; /* Altere para a cor desejada */
-  color: white; /* Altere para a cor desejada */
-  cursor: not-allowed; /* Define o cursor como indisponível */
+  background-color: gray;
+  color: white;
+  cursor: not-allowed; /* cursor indisponível */
 }
 
 
